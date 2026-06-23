@@ -20,12 +20,13 @@ export async function GET(
   }
 
   const { id } = await params;
-  const membership = await getMembership(id, session.user.id);
-  if (!membership) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
 
   try {
+    const membership = await getMembership(id, session.user.id);
+    if (!membership) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
     const project = await db.project.findUnique({
       where: { id },
       include: {
@@ -79,12 +80,13 @@ export async function PATCH(
   }
 
   const { id } = await params;
-  const membership = await getMembership(id, session.user.id);
-  if (!membership || membership.role !== "OWNER") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
 
   try {
+    const membership = await getMembership(id, session.user.id);
+    if (!membership || membership.role !== "OWNER") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const body = await req.json();
     const parsed = updateProjectSchema.safeParse(body);
     if (!parsed.success) {
@@ -115,12 +117,13 @@ export async function DELETE(
   }
 
   const { id } = await params;
-  const membership = await getMembership(id, session.user.id);
-  if (!membership || membership.role !== "OWNER") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
 
   try {
+    const membership = await getMembership(id, session.user.id);
+    if (!membership || membership.role !== "OWNER") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     await db.project.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch {
