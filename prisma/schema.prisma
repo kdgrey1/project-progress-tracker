@@ -37,6 +37,7 @@ model Account {
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
 }
 
 model Session {
@@ -45,6 +46,8 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model VerificationToken {
@@ -66,6 +69,8 @@ model Project {
   owner       User          @relation("ProjectOwner", fields: [ownerId], references: [id])
   members     ProjectMember[]
   milestones  Milestone[]
+
+  @@index([ownerId])
 }
 
 enum ProjectStatus {
@@ -100,6 +105,8 @@ model Milestone {
   createdAt   DateTime  @default(now())
   project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   tasks       Task[]
+
+  @@index([projectId])
 }
 
 model Task {
@@ -111,8 +118,12 @@ model Task {
   assigneeId  String?
   order       Int        @default(0)
   createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
   milestone   Milestone  @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
   assignee    User?      @relation("TaskAssignee", fields: [assigneeId], references: [id])
+
+  @@index([milestoneId])
+  @@index([assigneeId])
 }
 
 enum TaskStatus {
