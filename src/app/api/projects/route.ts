@@ -29,8 +29,8 @@ export async function GET() {
       orderBy: { joinedAt: "desc" },
     });
 
-    const projects = memberships.map(({ project }) => {
-      const allTasks = project.milestones.flatMap((m) => m.tasks);
+    const projects = memberships.map(({ project }: (typeof memberships)[number]) => {
+      const allTasks = project.milestones.flatMap((m: (typeof project.milestones)[number]) => m.tasks);
       return {
         ...project,
         milestones: undefined, // strip milestones from list view
