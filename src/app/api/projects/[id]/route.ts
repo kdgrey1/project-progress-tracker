@@ -54,8 +54,8 @@ export async function GET(
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    const allTasks = project.milestones.flatMap((m) => m.tasks);
-    const milestonesWithProgress = project.milestones.map((m) => ({
+    const allTasks = project.milestones.flatMap((m: (typeof project.milestones)[number]) => m.tasks);
+    const milestonesWithProgress = project.milestones.map((m: (typeof project.milestones)[number]) => ({
       ...m,
       progress: computeProgress(m.tasks),
     }));
