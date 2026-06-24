@@ -102,23 +102,6 @@ export default function RegisterPage() {
             </Button>
           </form>
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-slate-500">Or</span>
-            </div>
-          </div>
-
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-          >
-            Continue with Google
-          </Button>
-
           <p className="text-center text-sm text-slate-600">
             Have an account?{" "}
             <Link href="/login" className="font-medium underline underline-offset-4">
