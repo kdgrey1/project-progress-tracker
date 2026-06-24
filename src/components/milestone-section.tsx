@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { TaskItem } from "@/components/task-item";
 import { ProgressBar } from "@/components/progress-bar";
-import { Plus, Trash2, ChevronDown, ChevronRight } from "lucide-react";
+import { Plus, Trash2, ChevronDown, ChevronRight, Pencil, Check, X } from "lucide-react";
 
 interface Task {
   id: string;
@@ -28,6 +28,8 @@ export function MilestoneSection({ milestone, projectId }: MilestoneSectionProps
   const [expanded, setExpanded] = useState(true);
   const [addingTask, setAddingTask] = useState(false);
   const [taskTitle, setTaskTitle] = useState("");
+  const [editingName, setEditingName] = useState(false);
+  const [nameValue, setNameValue] = useState(milestone.name);
 
   const addTaskMutation = useMutation({
     mutationFn: (title: string) =>
@@ -42,6 +44,29 @@ export function MilestoneSection({ milestone, projectId }: MilestoneSectionProps
       setAddingTask(false);
     },
   });
+
+  const editNameMutation = useMutation({
+    mutationFn: (name: string) =>
+      fetch(`/api/milestones/${milestone.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      }).then((r) => r.json()),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["project", projectId] });
+      setEditingName(false);
+    },
+  });
+
+  function handleSaveName() {
+    const trimmed = nameValue.trim();
+    if (trimmed && trimmed !== milestone.name) {
+      editNameMutation.mutate(trimmed);
+    } else {
+      setEditingName(false);
+      setNameValue(milestone.name);
+    }
+  }
 
   const deleteMilestoneMutation = useMutation({
     mutationFn: () =>
@@ -75,9 +100,53 @@ export function MilestoneSection({ milestone, projectId }: MilestoneSectionProps
           )}
         </button>
 
-        <h3 className="font-medium text-slate-800 flex-1 min-w-0 truncate">
-          {milestone.name}
-        </h3>
+        {editingName ? (
+          <div className="flex-1 flex items-center gap-2 min-w-0">
+            <input
+              value={nameValue}
+              onChange={(e) => setNameValue(e.target.value)}
+              className="flex-1 text-sm font-medium border rounded px-2 py-0.5 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSaveName();
+                if (e.key === "Escape") {
+                  setEditingName(false);
+                  setNameValue(milestone.name);
+                }
+              }}
+            />
+            <button
+              type="button"
+              onClick={handleSaveName}
+              disabled={editNameMutation.isPending}
+              className="p-1 rounded hover:bg-slate-100 shrink-0"
+            >
+              <Check className="h-3.5 w-3.5 text-green-600" />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setEditingName(false);
+                setNameValue(milestone.name);
+              }}
+              className="p-1 rounded hover:bg-slate-100 shrink-0"
+            >
+              <X className="h-3.5 w-3.5 text-slate-500" />
+            </button>
+          </div>
+        ) : (
+          <div className="flex-1 flex items-center gap-1 min-w-0">
+            <h3 className="font-medium text-slate-800 truncate">{milestone.name}</h3>
+            <button
+              type="button"
+              onClick={() => setEditingName(true)}
+              className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors shrink-0"
+              aria-label="Edit milestone name"
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
 
         <div className="w-32 shrink-0">
           <ProgressBar value={milestone.progress} size="sm" />

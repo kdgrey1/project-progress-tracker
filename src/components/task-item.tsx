@@ -119,16 +119,24 @@ export function TaskItem({ task, projectId }: TaskItemProps) {
           </button>
         </div>
       ) : (
-        <span
-          className={cn(
-            "flex-1 text-sm cursor-pointer select-none",
-            task.status === "DONE" && "line-through text-slate-400"
-          )}
-          onClick={() => setEditing(true)}
-          title="Click to edit"
-        >
-          {task.title}
-        </span>
+        <>
+          <span
+            className={cn(
+              "flex-1 text-sm",
+              task.status === "DONE" && "line-through text-slate-400"
+            )}
+          >
+            {task.title}
+          </span>
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors shrink-0"
+            aria-label="Edit task"
+          >
+            <Pencil className="h-3 w-3" />
+          </button>
+        </>
       )}
 
       {/* Assignee avatar */}
